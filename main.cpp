@@ -16,13 +16,13 @@ int main()
 
 	cout << "\n3. Устранение матричной зависимости:\n";
 	circuit.elimination_of_matrix_dependency();
+	circuit.structural_matrix_output();
 
 	cout << "\n4. Преобразование матрицы в единичную:\n";
 	circuit.conversion_to_the_identity_matrix();
+	circuit.structural_matrix_output();
 
 	//cout << "\n5. Преобразование матрицы в единичную:\n";
 	//circuit.allocate_fundamental_matrix();
-
-	//
 
 }

@@ -23,6 +23,9 @@ private:
 	long double** RMatrix;
 	long double** UMatrix;
 	long double** IMatrix;
+
+	__uint8_t numberOfNotes;
+	__uint8_t numberOfElements;
 	__int8_t** structuralMatrix;
 	__int8_t** fundamentalMatrix;
 
