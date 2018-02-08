@@ -3,4 +3,5 @@ SOURCES += \
     func.cpp
 
 HEADERS += \
-    func.hpp
+    func.hpp \
+    types.hpp
