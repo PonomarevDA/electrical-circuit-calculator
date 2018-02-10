@@ -10,19 +10,27 @@ int main()
 	cout << "1. Ввод данных об электрической схеме в правильном формате:\n";
 	circuit.data_input();
 
-	cout << "\n2. Структурная матрица, составленная по ЗТК:\n";
-	circuit.create_structural_matrix_with_use_current();
+	cout << "\n2. Создание матрицы смежности:\n";
+	circuit.create_adjacency_matrix();
+
+	cout << "\n3. Создание ориентированного графа:\n";
+	circuit.create_oriented_graph();
 	circuit.structural_matrix_output();
 
-	cout << "\n3. Устранение матричной зависимости:\n";
+	cout << "\n4. Поиск дерева графа:\n";
+
+	cout << "\n5. Установка жесткой нумерации ветвей графа:\n";
+
+	cout << "\n6. Устранение матричной зависимости:\n";
 	circuit.elimination_of_matrix_dependency();
 	circuit.structural_matrix_output();
 
-	cout << "\n4. Преобразование матрицы в единичную:\n";
+	cout << "\n7. Преобразование матрицы в единичную:\n";
 	circuit.conversion_to_the_identity_matrix();
 	circuit.structural_matrix_output();
 
-	//cout << "\n5. Преобразование матрицы в единичную:\n";
-	//circuit.allocate_fundamental_matrix();
+	cout << "\n8. Выделение фундаментальной матрицы:\n";
+	circuit.allocate_fundamental_matrix();
+	circuit.fundamental_matrix_output();
 
 }
