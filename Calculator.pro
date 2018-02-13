@@ -1,7 +1,9 @@
 SOURCES += \
     main.cpp \
-    func.cpp
+    ECC.cpp \
+    testECC.cpp
 
 HEADERS += \
-    func.hpp \
-    types.hpp
+    types.hpp \
+    ECC.hpp \
+    testECC.hpp
