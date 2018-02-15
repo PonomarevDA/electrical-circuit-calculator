@@ -1,16 +1,12 @@
-#include <iostream>
-#include <deque>
-#include <set>
 #include <ECC.hpp>
-#include <types.hpp>
-#include <cstring>
 
 using namespace std;
+
 
 // 1. Ввод данных
 void ECC::input_data()
 {
-	// Кусок кода ниже заменить на ввод данных из файла со временем:
+	// Кусок кода ниже заменить на ввод данных из файла:
 	numberOfElements = 5;
 	dataArr = new dataStr[numberOfElements];
 	dataArr[0].init(1, 1, 4, 'u', 5);
@@ -18,7 +14,7 @@ void ECC::input_data()
 	dataArr[2].init(3, 3, 4, 'r', 1000);
 	dataArr[3].init(4, 2, 3, 'r', 1000);
 	dataArr[4].init(5, 4, 2, 'i', 0.005);
-	// Кусок кода выше заменить на ввод данных из файла со временем:
+	// Кусок кода выше заменить на ввод данных из файла.
 
 	// Подсчет количества узлов:
 	numberOfNodes = 0;
@@ -26,10 +22,11 @@ void ECC::input_data()
 		numberOfNodes = (numberOfNodes > dataArr[count].nodeFirst) ? numberOfNodes : dataArr[count].nodeFirst;
 }
 
-// 2. Предварительная сортировка входных данных
+// 2. Сортировка входных данных
 void ECC::sort_data()
 {
 	// Сначала ИН, затем R, в конце ИТ
+	cout << "Don\'t work yet :(" << endl;
 }
 
 // 3. Создание матрицы смежности
@@ -38,23 +35,13 @@ void ECC::create_adjacency_matrix()
 	// Выделение памяти для матрицы смежности (считаем граф неориентированным):
 	adjacencyMatrix = new bool* [numberOfNodes];
 	for (__uint8_t count = 0; count < numberOfNodes; count++)
-		adjacencyMatrix[count] = new bool [NUMBER_OF_ELEMENTS];
+		adjacencyMatrix[count] = new bool [numberOfElements];
 
 	// Заполняем матрицу смежности: 1 - есть ребро, 0 - нет ребра
 	for(__int8_t count = 0; count < numberOfElements; count++)
 	{
 		adjacencyMatrix[ (dataArr[count].nodeFirst) - 1][ (dataArr[count].nodeLast) - 1] = 1;
 		adjacencyMatrix[ (dataArr[count].nodeLast) - 1][ (dataArr[count].nodeFirst) - 1] = 1;
-	}
-
-	// Вывод матрицы смежности на экран:
-	for(__uint8_t i = 0; i < numberOfNodes; i++)
-	{
-		for(__uint8_t j = 0; j < numberOfNodes; j++)
-		{
-			cout << adjacencyMatrix[i][j] + 0 << " ";
-		}
-		cout << endl;
 	}
 }
 
@@ -64,18 +51,17 @@ void ECC::find_spanning_tree()
 	// Init
 	deque<uint8_t> nodesFuture;
 	deque<uint8_t> nodesPresent;
-	deque<uint8_t> nodesPast;	// обязательность сомнительна
-	set<uint8_t> chords;		// обязательность сомнительна
 	set<uint8_t> branches;
+	set<uint8_t> chords;
 
 	// Заполняем контейнеры nodesFuture и chords:
 	for(uint8_t node = 1; node <= numberOfNodes; node++)
 	{
+		chords.insert(chords.end(), node);
 		nodesFuture.push_back(node);
-		chords.insert(node);
 	}
 	for(uint8_t element = numberOfNodes + 1; element <= numberOfElements; element++)
-		chords.insert(element);
+		chords.insert(chords.end(), element);
 
 	// Пусть первый элемен (№0) будет первой ветвью дерева
 	nodesFuture.erase(nodesFuture.begin() + dataArr[0].nodeFirst - 1);
@@ -124,11 +110,10 @@ void ECC::find_spanning_tree()
 			}
 		}
 		// Если с узлом nodesPresent.at(0) уже нельзя образовать ветви
-		nodesPast.push_back(nodesPresent.at(0));
 		nodesPresent.erase(nodesPresent.begin());
 	}
 
-	// Вывод на экран содержимого списка
+	// Вывод на экран содержимого списков и множеств
 	cout << "nodesFuture: ";
 	for(uint8_t node = 0; node < nodesFuture.size(); node++)
 		cout << nodesFuture.at(node) + 0 << " ";
@@ -136,10 +121,6 @@ void ECC::find_spanning_tree()
 	cout << "\nnodesPresent: ";
 	for(uint8_t node = 0; node < nodesPresent.size(); node++)
 		cout << nodesPresent.at(node) + 0 << " ";
-
-	cout << "\nnodesPast: ";
-	for(uint8_t node = 0; node < nodesPast.size(); node++)
-		cout << nodesPast.at(node) + 0 << " ";
 
 	cout << "\nchords: ";
 	for(uint8_t element = 0; element < chords.size(); element++)
@@ -150,35 +131,93 @@ void ECC::find_spanning_tree()
 		cout << *branches.begin()+element + 0 << " ";
 	cout << endl;
 
+
+	tree = new uint8_t [branches.size() + 1];
+	tree[0] = branches.size();
+	for (uint8_t element = 1; element <= branches.size(); element++)
+		tree[element] = *branches.begin() + element - 1;
 }
 
-// 5. Создание структурной матрицы по ЗТК из массива входных данных
+// 5. Составление уравнений напряжения ветвей дерева:
+void ECC::create_equations_voltage_of_branches()
+{
+	// Выделение памяти для матрицы, инициализация и вывод на экран:
+	Rtree = new long double* [tree[0]];
+	for(uint8_t element = 0; element < tree[0]; element++)
+	{
+		Rtree[element] = new long double[tree[0]];
+		for(uint8_t col = 0; col < tree[0]; col++)
+			Rtree[element][col] = 0;
+		if(dataArr[ tree[element + 1] - 1].type == 'r')
+			Rtree[element][element] = dataArr[ tree[element + 1] - 1].value;
+		else
+			Rtree[element][element] = 0;
+	}
+
+	for(uint8_t row = 0; row < tree[0]; row++)
+	{
+		for(uint8_t col = 0; col < tree[0]; col++)
+		{
+			cout << Rtree[row][col] + 0 << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	// Выделение памяти для вектора, инициализация и вывод на экран:
+	I0 = new long double[tree[0]];
+	for(uint8_t element = 0; element < tree[0]; element++)
+	{
+		if(dataArr[ tree[element + 1] - 1 ].type == 'u')
+			I0[element] = dataArr[ tree[element + 1]  - 1].value;
+		else
+			I0[element] = 0;
+	}
+
+	for(uint8_t row = 0; row < tree[0]; row++)
+	{
+		cout << I0[row] + 0 << " ";
+	}
+	cout << endl;
+
+	// Вывод на экран номера ветвей дерева
+	for(uint8_t element = 1; element <= tree[0]; element++)
+		cout << tree[element] + 0 << " ";
+	cout << endl;
+
+}
+
+// 6. Составление уравнений токов хорд:
+
+
+// 7. Создание структурной матрицы по ЗТК из массива входных данных
 void ECC::create_oriented_graph()
 {
 	// Выделение памяти для структурной матрицы
-	structuralMatrix = new __int8_t* [NUMBER_OF_NODES];
-	for (__uint8_t count = 0; count < NUMBER_OF_NODES; count++)
-			structuralMatrix[count] = new __int8_t [NUMBER_OF_ELEMENTS];
+	structuralMatrix = new __int8_t* [numberOfNodes];
+	for (__uint8_t row = 0; row < numberOfNodes; row++)
+	{
+		structuralMatrix[row] = new __int8_t [numberOfElements];
+		for(__uint8_t col = 0; col < numberOfElements; col++)
+			structuralMatrix[row][col] = 0;
+	}
 
-	__int8_t buffer[NUMBER_OF_NODES][NUMBER_OF_ELEMENTS] = {
-		{1,  1,  0,  0,  0},
-		{0, -1,  0,  1, -1},
-		{0,  0,  1, -1,  0},
-		{-1, 0, -1,  0,  1}};
-
-	for(__int8_t count = 0; count < NUMBER_OF_NODES; count++)
-		memcpy(structuralMatrix[count], buffer[count], NUMBER_OF_ELEMENTS);
+	for(__int8_t elem = 0; elem < numberOfElements; elem++)
+	{
+		structuralMatrix[dataArr[elem].nodeFirst - 1][elem] = 1;
+		structuralMatrix[dataArr[elem].nodeLast - 1][elem] = -1;
+	}
 }
 
 
-// 6. Исключение базисного узла
+// 8. Исключение базисного узла
 void ECC::elimination_of_matrix_dependency()
 {
 	bool isMatrixDependent = 0;
-	for (__int8_t countOfNode = 0; countOfNode < NUMBER_OF_NODES; countOfNode++)
+	for (__int8_t countOfNode = 0; countOfNode < numberOfNodes; countOfNode++)
 	{
 		__int8_t sum_of_row = 0;
-		for (__int8_t countOfElement = 0; countOfElement < NUMBER_OF_ELEMENTS; countOfElement++)
+		for (__int8_t countOfElement = 0; countOfElement < numberOfElements; countOfElement++)
 		{
 			sum_of_row=+structuralMatrix[countOfNode][countOfElement];
 			if (isMatrixDependent = sum_of_row != 0)
@@ -196,7 +235,7 @@ void ECC::elimination_of_matrix_dependency()
 }
 
 
-// 7. Преобразование матирцы в единичную
+// 9. Преобразование матрицы в единичную
 void ECC::conversion_to_the_identity_matrix()
 {
 	enum {ERROR, OK};
@@ -287,7 +326,7 @@ void ECC::conversion_to_the_identity_matrix()
 	delete[] bufferRow;
 }
 
-// 8. Выделение фундаментальной матрицы
+// 10. Выделение фундаментальной матрицы
 void ECC::allocate_fundamental_matrix()
 {
 	fundamentalMatrix = new __int8_t* [numberOfNodes];
@@ -299,14 +338,20 @@ void ECC::allocate_fundamental_matrix()
 
 }
 
-// Последовательное выполнение всех методов
-void ECC::start()
+// Вывод матрицы смежности на экран:
+void ECC::show_adjacency_matrix()
 {
+	for(__uint8_t i = 0; i < numberOfNodes; i++)
+	{
+		for(__uint8_t j = 0; j < numberOfNodes; j++)
+			cout << adjacencyMatrix[i][j] + 0 << " ";
+		cout << endl;
+	}
 }
 
 
 // Форматированный вывод структурной матрицы
-void ECC::structural_matrix_output()
+void ECC::show_structural_matrix()
 {
 	for(__uint8_t i = 0; i < numberOfNodes; i++)
 	{
@@ -322,7 +367,7 @@ void ECC::structural_matrix_output()
 }
 
 // Форматированный вывод фундаментальной матрицы
-void ECC::fundamental_matrix_output()
+void ECC::show_fundamental_matrix()
 {
 	for(__uint8_t i = 0; i < numberOfNodes; i++)
 	{
