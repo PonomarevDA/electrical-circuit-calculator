@@ -22,6 +22,7 @@ void CalculatedExample()
 	circuit.create_equations_voltage_of_branches();
 
 	cout << "\n6. Составление уравнений токов хорд:\n";
+	circuit.create_equations_current_of_chords();
 
 	cout << "\n7. Создание ориентированного графа:\n";
 	circuit.create_oriented_graph();

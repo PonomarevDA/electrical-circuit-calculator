@@ -49,44 +49,49 @@ void ECC::create_adjacency_matrix()
 void ECC::find_spanning_tree()
 {
 	// Init
-	deque<uint8_t> nodesFuture;
-	deque<uint8_t> nodesPresent;
-	set<uint8_t> branches;
-	set<uint8_t> chords;
+	vector<uint8_t> nodesFuture;
+	vector<uint8_t> nodesPresent;
 
 	// Заполняем контейнеры nodesFuture и chords:
 	for(uint8_t node = 1; node <= numberOfNodes; node++)
 	{
-		chords.insert(chords.end(), node);
+		chords.push_back(node);
 		nodesFuture.push_back(node);
 	}
 	for(uint8_t element = numberOfNodes + 1; element <= numberOfElements; element++)
-		chords.insert(chords.end(), element);
+		chords.push_back(element);
 
 	// Пусть первый элемен (№0) будет первой ветвью дерева
-	nodesFuture.erase(nodesFuture.begin() + dataArr[0].nodeFirst - 1);
-	nodesFuture.erase(nodesFuture.begin() + dataArr[0].nodeLast - 1);
+	chords.erase(chords.begin());
+	branches.push_back(1);
+	for(uint8_t index = 0; index < nodesFuture.size(); index++)
+	{
+		if(dataArr[0].nodeFirst == nodesFuture[index] || dataArr[0].nodeLast == nodesFuture[index])
+		{
+			nodesFuture.erase(nodesFuture.begin() + index);
+			index--;
+		}
+	}
 	nodesPresent.push_back(dataArr[0].nodeFirst);
 	nodesPresent.push_back(dataArr[0].nodeLast);
-	chords.erase(chords.begin());
-	branches.insert(1);
 
-	// Основной цикл поиска - по элементам списка nodesPresent
+
+	// Основной цикл поиска - по элементам множества nodesPresent
 	while(!nodesPresent.empty())
 	{
-		// Цикл по узлам из списка nodesFuture:
-		for(uint8_t node = 0; node < nodesFuture.size(); node++)
+		// Цикл по узлам из множества nodesFuture:
+		for(uint8_t index = 0; index < nodesFuture.size(); index++)
 		{
-			// Первый узел списка nodesPresent образует ветвь дерева с узлом индекса node?
-			if( adjacencyMatrix[nodesFuture.at(node)][nodesPresent.at(0)] )
+			// Образует ли первый узел nodesPresent с ветвю дерева с узлом индекса node?
+			if( adjacencyMatrix[nodesFuture.at(index)][nodesPresent.at(0)] )
 			{
 				// Определение номера элемента
 				uint8_t number;
 				for(number = 0; number < numberOfElements; number++)
 				{
-					if( ( (dataArr[number].nodeFirst == nodesFuture.at(node)) &&
+					if( ( (dataArr[number].nodeFirst == nodesFuture.at(index)) &&
 						  (dataArr[number].nodeLast == nodesPresent.at(0))) ||
-						( (dataArr[number].nodeLast == nodesFuture.at(node)) &&
+						( (dataArr[number].nodeLast == nodesFuture.at(index)) &&
 						  (dataArr[number].nodeFirst == nodesPresent.at(0))))
 					{
 						break;
@@ -94,18 +99,30 @@ void ECC::find_spanning_tree()
 				}
 				number++;
 				// Проверка, что данный элемнент уже не является ветвью дерева
-				if(branches.count(number))
-					break;
+				bool result = 0;
+				for(uint8_t count = 0; count < branches.size(); count++)
+				{
+					if(branches[count] == number)
+						result = 1;
+				}
 				// Проверка, что данный элемент не является ИТ
-				if(dataArr[number - 1].type == 'i')
-					break;
+				if (result == 0)
+				{
+					if(dataArr[number - 1].type == 'i')
+						break;
+				}
 
-				// В таком случае, рассматриваемый элемент - ветвь дерева
-				chords.erase(number);
+
+				// Если все ок, то рассматриваемый элемент - ветвь дерева
 				branches.insert(branches.end(), number);
-				nodesPresent.push_back(nodesFuture.at(node));
-				nodesFuture.erase(nodesFuture.begin() + node);
-				node--; // !!!размер nodesFuture уменьшился на 1
+				for(uint8_t count = 0; count < chords.size(); count++)
+				{
+					if(chords[count] == number)
+						chords.erase(chords.begin() + count);
+				}
+				nodesPresent.push_back(nodesFuture.at(index));
+				nodesFuture.erase(nodesFuture.begin() + index);
+				index--; // !!!размер nodesFuture уменьшился на 1
 				break;
 			}
 		}
@@ -130,33 +147,25 @@ void ECC::find_spanning_tree()
 	for(uint8_t element = 0; element < branches.size(); element++)
 		cout << *branches.begin()+element + 0 << " ";
 	cout << endl;
-
-
-	tree = new uint8_t [branches.size() + 1];
-	tree[0] = branches.size();
-	for (uint8_t element = 1; element <= branches.size(); element++)
-		tree[element] = *branches.begin() + element - 1;
 }
 
 // 5. Составление уравнений напряжения ветвей дерева:
 void ECC::create_equations_voltage_of_branches()
 {
-	// Выделение памяти для матрицы, инициализация и вывод на экран:
-	Rtree = new long double* [tree[0]];
-	for(uint8_t element = 0; element < tree[0]; element++)
+	// Матрица сопротивлений ветвей дерева:
+	Rtree = new long double* [branches.size()];
+	for(uint8_t element = 0; element < branches.size(); element++)
 	{
-		Rtree[element] = new long double[tree[0]];
-		for(uint8_t col = 0; col < tree[0]; col++)
+		Rtree[element] = new long double[branches.size()];
+		for(uint8_t col = 0; col < branches.size(); col++)
 			Rtree[element][col] = 0;
-		if(dataArr[ tree[element + 1] - 1].type == 'r')
-			Rtree[element][element] = dataArr[ tree[element + 1] - 1].value;
-		else
-			Rtree[element][element] = 0;
+		if(dataArr[ *(branches.begin() + element) -1 ].type == 'r')
+			Rtree[element][element] = dataArr[ *(branches.begin() + element) -1 ].value;
 	}
 
-	for(uint8_t row = 0; row < tree[0]; row++)
+	for(uint8_t row = 0; row < branches.size(); row++)
 	{
-		for(uint8_t col = 0; col < tree[0]; col++)
+		for(uint8_t col = 0; col < branches.size(); col++)
 		{
 			cout << Rtree[row][col] + 0 << " ";
 		}
@@ -164,31 +173,74 @@ void ECC::create_equations_voltage_of_branches()
 	}
 	cout << endl;
 
-	// Выделение памяти для вектора, инициализация и вывод на экран:
-	I0 = new long double[tree[0]];
-	for(uint8_t element = 0; element < tree[0]; element++)
+	// Вектор напряжений ветвей дерева:
+	U0 = new long double[branches.size()];
+	for(uint8_t element = 0; element < branches.size(); element++)
 	{
-		if(dataArr[ tree[element + 1] - 1 ].type == 'u')
-			I0[element] = dataArr[ tree[element + 1]  - 1].value;
+		if(dataArr[ *(branches.begin() + element) -1 ].type == 'u')
+			U0[element] = dataArr[ *(branches.begin() + element) -1 ].value;
 		else
-			I0[element] = 0;
+			U0[element] = 0;
 	}
 
-	for(uint8_t row = 0; row < tree[0]; row++)
+	for(uint8_t row = 0; row < branches.size(); row++)
 	{
-		cout << I0[row] + 0 << " ";
+		cout << U0[row] + 0 << " ";
 	}
 	cout << endl;
 
 	// Вывод на экран номера ветвей дерева
-	for(uint8_t element = 1; element <= tree[0]; element++)
-		cout << tree[element] + 0 << " ";
+	for(uint8_t element = 0; element < branches.size(); element++)
+		cout << branches[element] + 0 << " ";
 	cout << endl;
 
 }
 
 // 6. Составление уравнений токов хорд:
+void ECC::create_equations_current_of_chords()
+{
+	// Матрица проводимости хорд:
+	Gchord = new long double* [chords.size()];
+	for(uint8_t element = 0; element < chords.size(); element++)
+	{
+		Gchord[element] = new long double[chords.size()];
+		for(uint8_t col = 0; col < chords.size(); col++)
+			Gchord[element][col] = 0;
+		if(dataArr[ *(chords.begin() + element) -1 ].type == 'r')
+			Gchord[element][element] = 1 / dataArr[ *(chords.begin() + element) -1 ].value;
+	}
 
+	for(uint8_t row = 0; row < chords.size(); row++)
+	{
+		for(uint8_t col = 0; col < chords.size(); col++)
+		{
+			cout << Gchord[row][col] + 0 << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	// Вектор токов хорд:
+	I0 = new long double[chords.size()];
+	for(uint8_t element = 0; element < chords.size(); element++)
+	{
+		if(dataArr[ *(chords.begin() + element) -1 ].type == 'i')
+			I0[element] = dataArr[ *(chords.begin() + element) -1 ].value;
+		else
+			I0[element] = 0;
+	}
+
+	for(uint8_t row = 0; row < chords.size(); row++)
+	{
+		cout << I0[row] + 0 << " ";
+	}
+	cout << endl;
+
+	// Вывод на экран номера хорд
+	for(uint8_t element = 0; element < chords.size(); element++)
+		cout << chords[element] + 0 << " ";
+	cout << endl;
+}
 
 // 7. Создание структурной матрицы по ЗТК из массива входных данных
 void ECC::create_oriented_graph()

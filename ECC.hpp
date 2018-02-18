@@ -28,7 +28,7 @@ public:
 	void conversion_to_the_identity_matrix();
 	void allocate_fundamental_matrix();
 
-//	void calculate();
+	void calculate();
 
 	void show_adjacency_matrix();
 	void show_structural_matrix();
@@ -62,7 +62,8 @@ private:
 	__int8_t** structuralMatrix;		// структурная матрица
 	__int8_t** fundamentalMatrix;		// фундаментальная матрица (F)
 
-	uint8_t* tree;
+	vector<uint8_t> branches;
+	vector<uint8_t> chords;
 };
 
 
