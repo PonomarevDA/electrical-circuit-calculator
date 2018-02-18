@@ -390,6 +390,12 @@ void ECC::allocate_fundamental_matrix()
 
 }
 
+// 11. Алгоритм расчета цепи
+void ECC::calculate()
+{
+
+}
+
 // Вывод матрицы смежности на экран:
 void ECC::show_adjacency_matrix()
 {

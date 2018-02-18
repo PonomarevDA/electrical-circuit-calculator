@@ -1,9 +1,11 @@
 SOURCES += \
     main.cpp \
     ECC.cpp \
-    testECC.cpp
+    testECC.cpp \
+    matrix.cpp
 
 HEADERS += \
     types.hpp \
     ECC.hpp \
-    testECC.hpp
+    testECC.hpp \
+    matrix.hpp

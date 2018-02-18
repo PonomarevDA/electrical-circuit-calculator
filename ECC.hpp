@@ -3,7 +3,6 @@
 
 #include <types.hpp>
 #include <iostream>
-#include <deque>
 #include <set>
 #include <vector>
 #include <cstring>

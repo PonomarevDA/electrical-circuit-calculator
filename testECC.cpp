@@ -1,5 +1,6 @@
 #include <testECC.hpp>
 
+
 using namespace std;
 
 ECC circuit;
@@ -39,4 +40,56 @@ void CalculatedExample()
 	cout << "\n10. Выделение фундаментальной матрицы:\n";
 	circuit.allocate_fundamental_matrix();
 	circuit.show_fundamental_matrix();
+}
+
+void testMultiplyMatrix()
+{
+	// Init Left Matrix:
+	uint8_t leftRows = 3;
+	uint8_t leftCols = 4;
+	vector < vector <double> > left( leftRows, vector <double> (leftCols) );
+	for(uint8_t row = 0; row < leftRows; row++)
+	{
+		for(uint8_t col = 0; col < leftCols; col++)
+			left[row][col] = col + row;
+	}
+
+	// Init Right Matrix:
+	uint8_t rightRows = 4;
+	uint8_t rightCols = 2;
+	vector < vector <double> > right( rightRows, vector <double> (rightCols) );
+	for(uint8_t row = 0; row < rightRows; row++)
+	{
+		for(uint8_t col = 0; col < rightCols; col++)
+			right[row][col] = col + row;
+	}
+
+	// Result Matrix:
+	uint8_t resultRows = leftRows;
+	uint8_t resultCols = rightCols;
+	vector < vector <double> > result( resultRows, vector <double> (resultCols) );
+	for(uint8_t row = 0; row < resultRows; row++)
+	{
+		for(uint8_t col = 0; col < resultCols; col++)
+			result[row][col] = 0;
+	}
+
+	multiply(left, right, result);
+
+	// Output:
+	showMatrix(left);
+	showMatrix(right);
+	showMatrix(result);
+}
+
+template <typename T>
+void showMatrix(T matrix)
+{
+	for(uint8_t row = 0; row < matrix.size(); row++)
+	{
+		for(uint8_t col = 0; col < matrix[0].size(); col++)
+			cout << matrix[row][col] << " ";
+		cout << endl;
+	}
+	cout << endl;
 }
