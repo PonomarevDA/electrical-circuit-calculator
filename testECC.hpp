@@ -6,6 +6,7 @@
 
 void CalculatedExample();
 void testMultiplyMatrix();
+void testTransposeMatrix();
 
 template <typename T>
 void showMatrix(T matrix);

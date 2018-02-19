@@ -35,6 +35,27 @@ error_t multiply(T left, T right, T& result)
 }
 
 // Транспонирование матрицы
+template <typename T>
+error_t transpose(const T primary, T& total)
+{
+	uint8_t primaryRows = primary.size();
+	uint8_t primaryCols = primary[0].size();
+	uint8_t totalRows = total.size();
+	uint8_t totalCols = total[0].size();
+
+	// Check dimension:
+	if(primaryRows  != totalCols || primaryCols  != totalRows)
+		return DIMENSION_ERROR;
+
+	// Transpose matrix:
+	// Multiply matrix:
+	for(uint8_t row = 0; row < totalRows; row++)
+	{
+		for(uint8_t col = 0; col < totalCols; col++)
+			total[row][col] = primary[col][row];
+	}
+	return OK;
+}
 
 // Обратная матрица
 

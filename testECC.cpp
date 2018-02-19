@@ -42,6 +42,7 @@ void CalculatedExample()
 	circuit.show_fundamental_matrix();
 }
 
+
 void testMultiplyMatrix()
 {
 	// Init Left Matrix:
@@ -81,6 +82,30 @@ void testMultiplyMatrix()
 	showMatrix(right);
 	showMatrix(result);
 }
+
+
+void testTransposeMatrix()
+{
+	// Initial Matrix:
+	uint8_t matrixRows = 3;
+	uint8_t matrixCols = 4;
+	vector < vector <double> > primaryMatrix( matrixRows, vector <double> (matrixCols) );
+	for(uint8_t row = 0; row < matrixRows; row++)
+	{
+		for(uint8_t col = 0; col < matrixCols; col++)
+			primaryMatrix[row][col] = col + row;
+	}
+	showMatrix(primaryMatrix);
+
+
+	// Tranponse Matrix:
+	uint8_t newMatrixRows = matrixCols;
+	uint8_t newMatrixCols = matrixRows;
+	vector < vector <double> > totalMatrix( newMatrixRows, vector <double> (newMatrixCols) );
+	transpose(primaryMatrix, totalMatrix);
+	showMatrix(totalMatrix);
+}
+
 
 template <typename T>
 void showMatrix(T matrix)
