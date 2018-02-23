@@ -36,10 +36,11 @@ void CalculatedExample()
 	circuit.input_data();
 
 	cout << "\n2. Сортировка введенных данных:\n";
+	circuit.sort_data();
 
 	cout << "\n3. Создание матрицы смежности:\n";
 	circuit.create_adjacency_matrix();
-	circuit.show_adjacency_matrix();
+	//circuit.show_adjacency_matrix();
 
 	cout << "\n4. Поиск остовного дерева графа:\n";
 	circuit.find_spanning_tree();
@@ -52,15 +53,18 @@ void CalculatedExample()
 
 	cout << "\n7. Создание ориентированного графа:\n";
 	circuit.create_oriented_graph();
-	circuit.show_structural_matrix();
+//	circuit.show_structural_matrix();
 
 	cout << "\n8. Устранение матричной зависимости:\n";
 	circuit.elimination_of_matrix_dependency();
-	circuit.show_structural_matrix();
+	//circuit.show_structural_matrix();
 
 	cout << "\n9. Выделение фундаментальной матрицы:\n";
 	circuit.allocate_fundamental_matrix();
-	circuit.show_fundamental_matrix();
+	//circuit.show_fundamental_matrix();
+
+	cout << "\n10. Ответ:\n";
+	circuit.calculate();
 }
 
 
@@ -96,7 +100,7 @@ void testMultiplyMatrix()
 			result[row][col] = 0;
 	}
 
-	multiply(left, right, result);
+	//multiply(left, right, result);
 
 	// Output:
 	showMatrix(left);
@@ -123,7 +127,7 @@ void testTransposeMatrix()
 	uint8_t newMatrixRows = matrixCols;
 	uint8_t newMatrixCols = matrixRows;
 	vector < vector <double> > totalMatrix( newMatrixRows, vector <double> (newMatrixCols) );
-	transpose(primaryMatrix, totalMatrix);
+	//transpose(primaryMatrix, totalMatrix);
 	showMatrix(totalMatrix);
 }
 
@@ -146,16 +150,12 @@ void testInverseMatrix()
 	// Initial Matrix:
 	uint8_t matrixRows = 3;
 	uint8_t matrixCols = 3;
-	double** matrix = new double*[matrixRows];
-	for(uint8_t row = 0; row < matrixRows; row++)
-		matrix[row] = new double[matrixCols];
-	matrix[0][0] = 2; matrix[0][1] = 2; matrix[0][2] = 3;
-	matrix[1][0] = 4; matrix[1][1] = 5; matrix[1][2] = 6;
-	matrix[2][0] = 7; matrix[2][1] = 8; matrix[2][2] = 9;
-	showMatrix(matrix, matrixRows, matrixCols);
-
-
-	inverse(matrix, matrixRows, matrixCols);
-	showMatrix(matrix, matrixRows, matrixCols);
+	matrix m(matrixRows, matrixCols);
+	m[0][0] = 2; m[0][1] = 2; m[0][2] = 3;
+	m[1][0] = 4; m[1][1] = 5; m[1][2] = 6;
+	m[2][0] = 7; m[2][1] = 8; m[2][2] = 9;
+	m.show();
+	m.inverse();
+	m.show();
 
 }

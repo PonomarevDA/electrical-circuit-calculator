@@ -13,7 +13,7 @@ void ECC::input_data()
 	dataArr[1].init(2, 1, 2, 'r', 1000);
 	dataArr[2].init(3, 3, 4, 'r', 1000);
 	dataArr[3].init(4, 2, 3, 'r', 1000);
-	dataArr[4].init(5, 4, 2, 'i', 0.005);
+	dataArr[4].init(5, 4, 2, 'i', 0.01);
 	// Кусок кода выше заменить на ввод данных из файла.
 
 	// Подсчет количества узлов:
@@ -33,22 +33,23 @@ void ECC::sort_data()
 void ECC::create_adjacency_matrix()
 {
 	// Выделение памяти для матрицы смежности (считаем граф неориентированным):
-	adjacencyMatrix = new bool* [numberOfNodes];
-	for (__uint8_t count = 0; count < numberOfNodes; count++)
-		adjacencyMatrix[count] = new bool [numberOfElements];
+	adjacencyMatrix.init(numberOfNodes, numberOfElements);
 
 	// Заполняем матрицу смежности: 1 - есть ребро, 0 - нет ребра
-	for(__int8_t count = 0; count < numberOfElements; count++)
+	for(uint8_t count = 0; count < numberOfElements; count++)
 	{
 		adjacencyMatrix[ (dataArr[count].nodeFirst) - 1][ (dataArr[count].nodeLast) - 1] = 1;
 		adjacencyMatrix[ (dataArr[count].nodeLast) - 1][ (dataArr[count].nodeFirst) - 1] = 1;
 	}
+
+	// Вывод матрицы смоежности в терминал
+	adjacencyMatrix.show();
 }
 
 // 4. Поиск остовного дерева
 void ECC::find_spanning_tree()
 {
-	// Init
+	// Определения
 	vector<uint8_t> nodesFuture;
 	vector<uint8_t> nodesPresent;
 
@@ -130,7 +131,7 @@ void ECC::find_spanning_tree()
 		nodesPresent.erase(nodesPresent.begin());
 	}
 
-	// Вывод на экран содержимого списков и множеств
+	// Вывод на экран содержимого векторов
 	cout << "nodesFuture: ";
 	for(uint8_t node = 0; node < nodesFuture.size(); node++)
 		cout << nodesFuture.at(node) + 0 << " ";
@@ -153,87 +154,64 @@ void ECC::find_spanning_tree()
 void ECC::create_equations_voltage_of_branches()
 {
 	// Матрица сопротивлений ветвей дерева:
-	Rtree = new long double* [branches.size()];
+	Rtree.init(branches.size(), branches.size());
 	for(uint8_t element = 0; element < branches.size(); element++)
 	{
-		Rtree[element] = new long double[branches.size()];
 		for(uint8_t col = 0; col < branches.size(); col++)
 			Rtree[element][col] = 0;
 		if(dataArr[ *(branches.begin() + element) -1 ].type == 'r')
 			Rtree[element][element] = dataArr[ *(branches.begin() + element) -1 ].value;
 	}
 
-	for(uint8_t row = 0; row < branches.size(); row++)
-	{
-		for(uint8_t col = 0; col < branches.size(); col++)
-		{
-			cout << Rtree[row][col] + 0 << " ";
-		}
-		cout << endl;
-	}
+	U0.show();
 	cout << endl;
 
 	// Вектор напряжений ветвей дерева:
-	U0 = new long double[branches.size()];
+	U0.init(branches.size(), 1);
 	for(uint8_t element = 0; element < branches.size(); element++)
 	{
 		if(dataArr[ *(branches.begin() + element) -1 ].type == 'u')
-			U0[element] = dataArr[ *(branches.begin() + element) -1 ].value;
+			U0[element][0] = dataArr[ *(branches.begin() + element) -1 ].value;
 		else
-			U0[element] = 0;
+			U0[element][0] = 0;
 	}
 
-	for(uint8_t row = 0; row < branches.size(); row++)
-	{
-		cout << U0[row] + 0 << " ";
-	}
+	Rtree.show();
 	cout << endl;
 
 	// Вывод на экран номера ветвей дерева
 	for(uint8_t element = 0; element < branches.size(); element++)
 		cout << branches[element] + 0 << " ";
 	cout << endl;
-
 }
 
 // 6. Составление уравнений токов хорд:
 void ECC::create_equations_current_of_chords()
 {
 	// Матрица проводимости хорд:
-	Gchord = new long double* [chords.size()];
+	Gchord.init( chords.size(), chords.size() );
 	for(uint8_t element = 0; element < chords.size(); element++)
 	{
-		Gchord[element] = new long double[chords.size()];
 		for(uint8_t col = 0; col < chords.size(); col++)
 			Gchord[element][col] = 0;
 		if(dataArr[ *(chords.begin() + element) -1 ].type == 'r')
 			Gchord[element][element] = 1 / dataArr[ *(chords.begin() + element) -1 ].value;
 	}
 
-	for(uint8_t row = 0; row < chords.size(); row++)
-	{
-		for(uint8_t col = 0; col < chords.size(); col++)
-		{
-			cout << Gchord[row][col] + 0 << " ";
-		}
-		cout << endl;
-	}
+	Gchord.show();
 	cout << endl;
 
 	// Вектор токов хорд:
-	I0 = new long double[chords.size()];
+	I0.init(chords.size(), 1);
 	for(uint8_t element = 0; element < chords.size(); element++)
 	{
 		if(dataArr[ *(chords.begin() + element) -1 ].type == 'i')
-			I0[element] = dataArr[ *(chords.begin() + element) -1 ].value;
+			I0[element][0] = dataArr[ *(chords.begin() + element) -1 ].value;
 		else
-			I0[element] = 0;
+			I0[element][0] = 0;
 	}
 
-	for(uint8_t row = 0; row < chords.size(); row++)
-	{
-		cout << I0[row] + 0 << " ";
-	}
+	I0.show();
 	cout << endl;
 
 	// Вывод на экран номера хорд
@@ -245,11 +223,10 @@ void ECC::create_equations_current_of_chords()
 // 7. Создание структурной матрицы по ЗТК из массива входных данных
 void ECC::create_oriented_graph()
 {
-	// Выделение памяти для структурной матрицы
-	structuralMatrix = new __int8_t* [numberOfNodes];
+	// Выделение памяти для структурной матрицы и инициализация
+	structuralMatrix.init(numberOfNodes, numberOfElements);
 	for (__uint8_t row = 0; row < numberOfNodes; row++)
 	{
-		structuralMatrix[row] = new __int8_t [numberOfElements];
 		for(__uint8_t col = 0; col < numberOfElements; col++)
 			structuralMatrix[row][col] = 0;
 	}
@@ -259,7 +236,11 @@ void ECC::create_oriented_graph()
 		structuralMatrix[dataArr[elem].nodeFirst - 1][elem] = 1;
 		structuralMatrix[dataArr[elem].nodeLast - 1][elem] = -1;
 	}
+
+	// Вывод матрицы в терминал:
+	structuralMatrix.show();
 }
+
 
 
 // 8. Исключение базисного узла
@@ -272,7 +253,7 @@ void ECC::elimination_of_matrix_dependency()
 		for (__int8_t countOfElement = 0; countOfElement < numberOfElements; countOfElement++)
 		{
 			sum_of_row=+structuralMatrix[countOfNode][countOfElement];
-			if (isMatrixDependent = sum_of_row != 0)
+			if (isMatrixDependent = (sum_of_row != 0) )
 				break;
 		}
 		if (isMatrixDependent)
@@ -282,70 +263,81 @@ void ECC::elimination_of_matrix_dependency()
 	if (isMatrixDependent)
 	{
 		cout << "Матрица линейно зависима, сделаем ее независимой\n";
+		structuralMatrix.deleteLastRow();
 		numberOfNodes--;
 	}
+
+	// Вывод матрицы в терминал:
+	structuralMatrix.show();
 }
 
 
 // 9. Выделение фундаментальной матрицы
 void ECC::allocate_fundamental_matrix()
 {
-	identity(structuralMatrix, numberOfNodes, numberOfElements);
-	fundamentalMatrix = new __int8_t* [numberOfNodes];
-	for (__uint8_t row = 0; row < numberOfNodes; row++)
-	{
-		fundamentalMatrix[row] = new __int8_t [numberOfElements - numberOfNodes];
-		memcpy(fundamentalMatrix[row], structuralMatrix[row] + numberOfNodes, numberOfElements - numberOfNodes);
-	}
+	structuralMatrix.identity();
+	structuralMatrix.show();
+	F.init(numberOfNodes, numberOfElements - numberOfNodes);
+	for (uint8_t row = 0; row < numberOfNodes; row++)
+		memcpy(F.data[row], structuralMatrix.data[row] + numberOfNodes, (numberOfElements - numberOfNodes)*sizeof(double));
 
+	// Вывод матрицы в терминал:
+	F.show();
 }
 
 // 11. Алгоритм расчета цепи
 void ECC::calculate()
 {
-
-}
-
-// Вывод матрицы смежности на экран:
-void ECC::show_adjacency_matrix()
-{
-	for(__uint8_t i = 0; i < numberOfNodes; i++)
+	Itree.init(branches.size(), 0);
 	{
-		for(__uint8_t j = 0; j < numberOfNodes; j++)
-			cout << adjacencyMatrix[i][j] + 0 << " ";
-		cout << endl;
-	}
-}
-
-
-// Форматированный вывод структурной матрицы
-void ECC::show_structural_matrix()
-{
-	for(__uint8_t i = 0; i < numberOfNodes; i++)
-	{
-		for(__uint8_t j = 0; j < numberOfElements; j++)
+		matrix bufferLeft(3, 3);
+		matrix bufferRight(3, 3);
+		matrix buffer(3, 3);
+		matrix ones3(3, 3);
+		for(uint8_t row = 0; row < 3; row++)
 		{
-			if (!((structuralMatrix[i][j] >> 7) & 1))
-				cout << " ";
-			cout << structuralMatrix[i][j] + 0 << " ";
-
+			for(uint8_t col = 0; col < 3; col++)
+			{
+				ones3[row][col] = 0;
+				if (row == col)
+					ones3[row][col] = 1;
+			}
 		}
+		bufferLeft = F * Gchord * F.transpose() * Rtree + ones3;
+		bufferLeft.inverse();
+		bufferRight = (F * Gchord * F.transpose() * U0);
+		buffer = F * I0;
+		bufferRight = bufferRight + buffer;
+		Itree = bufferLeft * bufferRight * (-1);
 		cout << endl;
+		Itree.show();
 	}
-}
 
-// Форматированный вывод фундаментальной матрицы
-void ECC::show_fundamental_matrix()
-{
-	for(__uint8_t i = 0; i < numberOfNodes; i++)
+	Uchord.init(chords.size(), 0);
 	{
-		for(__uint8_t j = 0; j < numberOfElements - numberOfNodes; j++)
+		matrix ones2(2, 2);
+		matrix buffer(2, 2);
+		matrix bufferRight(2, 2);
+		matrix bufferLeft(2, 2);
+		for(uint8_t row = 0; row < 2; row++)
 		{
-			if (!((fundamentalMatrix[i][j] >> 7) & 1))
-				cout << " ";
-			cout << fundamentalMatrix[i][j] + 0 << " ";
-
+			for(uint8_t col = 0; col < 2; col++)
+			{
+				ones2[row][col] = 0;
+				if (row == col)
+					ones2[row][col] = 1;
+			}
 		}
+		bufferLeft = F.transpose() * Rtree * F * Gchord + ones2;
+		bufferLeft = bufferLeft.inverse();
+		bufferRight = (F.transpose() * Rtree * F * I0);
+		buffer = F.transpose() * U0 * (-1);
+		bufferRight = bufferRight + buffer;
+		Uchord = bufferLeft * bufferRight * (-1);
 		cout << endl;
+		Uchord.show();
 	}
+
+
+
 }

@@ -13,9 +13,38 @@ using namespace std;
 // electrical circuit calculator
 class ECC
 {
+private:
+	struct dataStr						// строка входных данных
+	{
+		void init(uint8_t i, uint8_t f, uint8_t l, int8_t t, double v)
+		{ index = i; nodeFirst = f; nodeLast = l; type = t; value = v;}
+		uint8_t index;
+		uint8_t nodeFirst;
+		uint8_t nodeLast;
+		int8_t type;
+		double value;
+	};
+
+	dataStr* dataArr;			// входные данные
+	uint8_t numberOfNodes;		// входные данные
+	uint8_t numberOfElements;	// входные данные
+
+	vector<uint8_t> branches;	// вектор элементов - ветвей дерева
+	vector<uint8_t> chords;		// вектор элементов - хорд
+	matrix adjacencyMatrix;		// матрица смежности
+	matrix structuralMatrix;	// структурная матрица
+
+	matrix Rtree;				// диагональная матрица сопротивлений (Ом)
+	matrix Gchord;				// диагональная матрица проводимостей (См)
+	matrix U0;					// вектор напряжений (В)
+	matrix I0;					// вектор токов (А)
+	matrix F;					// фундаментальная матрица (F)
+	matrix Itree;				// Вектор токов дерева (Iд)
+	matrix Uchord;				// Вектор напряжений хорд (Uх)
+
 public:
 	//ECC();
-	void input_data();
+	void input_data();			//
 	void sort_data();
 
 	void create_adjacency_matrix();
@@ -35,34 +64,7 @@ public:
 
 
 
-private:
-	struct dataStr						// строка входных данных
-	{
-		void init(uint8_t i, uint8_t f, uint8_t l, int8_t t, double v)
-		{ index = i; nodeFirst = f; nodeLast = l; type = t; value = v;}
-		uint8_t index;
-		uint8_t nodeFirst;
-		uint8_t nodeLast;
-		int8_t type;
-		double value;
-	};
 
-	dataStr* dataArr;
-	__uint8_t numberOfNodes;
-	__uint8_t numberOfElements;
-
-	bool** adjacencyMatrix;				// матрица смежности
-
-	long double** Rtree;				// диагональная матрица сопротивлений (Ом)
-	long double** Gchord;				// диагональная матрица проводимостей (См)
-	long double* U0;					// вектор напряжений (В)
-	long double* I0;					// вектор токов (А)
-
-	__int8_t** structuralMatrix;		// структурная матрица
-	__int8_t** fundamentalMatrix;		// фундаментальная матрица (F)
-
-	vector<uint8_t> branches;
-	vector<uint8_t> chords;
 };
 
 

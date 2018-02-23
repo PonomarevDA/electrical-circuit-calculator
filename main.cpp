@@ -10,5 +10,5 @@ int main()
 	//testMultiplyMatrix();
 	//testTransposeMatrix();
 	//testIdentityMatrix()
-	testInverseMatrix();
+	//testInverseMatrix();
 }
