@@ -6,5 +6,9 @@ using namespace std;
 
 int main()
 {
-	testTransposeMatrix();
+	CalculatedExample();
+	//testMultiplyMatrix();
+	//testTransposeMatrix();
+	//testIdentityMatrix()
+	testInverseMatrix();
 }

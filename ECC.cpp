@@ -287,100 +287,10 @@ void ECC::elimination_of_matrix_dependency()
 }
 
 
-// 9. Преобразование матрицы в единичную
-void ECC::conversion_to_the_identity_matrix()
-{
-	enum {ERROR, OK};
-	bool status = OK;
-	__uint8_t* bufferRow;
-	bufferRow = new __uint8_t[numberOfElements];
-
-	// Прямой ход
-	for (__uint8_t countConv = 0; countConv < numberOfNodes; countConv++)
-	{
-		// Перестановка строк матрицы, если необходимо:
-		if(structuralMatrix[countConv][countConv] == 0)
-		{
-			memcpy(bufferRow, (*structuralMatrix + countConv*numberOfElements), numberOfElements - countConv);
-			for(__uint8_t countSort = countConv + 1; countSort < numberOfNodes; countSort++)
-			{
-				if(structuralMatrix[countSort][countConv] != 0)
-				{
-					memcpy((*structuralMatrix + countConv*numberOfElements), (*structuralMatrix + countSort*numberOfElements + countConv), numberOfElements - countConv);
-					memcpy((*structuralMatrix + countSort*numberOfElements + countConv), bufferRow, numberOfElements - countConv);
-					continue;
-				}
-				if(countSort == numberOfNodes - 1)
-				{
-					status = ERROR;
-				}
-			}
-		}
-		// Инверсия строки, если необходимо:
-		if(status == OK)
-		{
-			if(structuralMatrix[countConv][countConv] == -1)
-			{
-				for(__uint8_t countInverse = countConv; countInverse < numberOfElements; countInverse++)
-				{
-					structuralMatrix[countConv][countInverse] *= -1;
-				}
-			}
-		}
-
-		// Обнуляем элменты под номерами countConv для нижних строк:
-		if(status == OK)
-		{
-			for(__uint8_t rowZero = countConv + 1; rowZero < numberOfNodes; rowZero++)
-			{
-				if(structuralMatrix[rowZero][countConv] == 1)
-				{
-					for(__uint8_t colZero = countConv; colZero < numberOfElements; colZero++)
-					{
-						structuralMatrix[rowZero][colZero] -= structuralMatrix[countConv][colZero];
-					}
-				}
-				else if(structuralMatrix[rowZero][countConv] == -1)
-				{
-					for(__uint8_t colZero = countConv; colZero < numberOfElements; colZero++)
-					{
-						structuralMatrix[rowZero][colZero] += structuralMatrix[countConv][colZero];
-					}
-				}
-			}
-		}
-	}
-	// Обратный ход
-	if(status == OK)
-	{
-		for (__int8_t rowZero = numberOfNodes - 2; rowZero >= 0; rowZero--)
-		{
-			for (__uint8_t colZero = rowZero + 1; colZero < numberOfNodes; colZero++)
-			{
-				if (structuralMatrix[rowZero][colZero] == 1)
-				{
-					for (__uint8_t colCount = colZero; colCount < numberOfElements; colCount++)
-					{
-						structuralMatrix[rowZero][colCount] -= structuralMatrix[rowZero + (colZero - rowZero)][colCount];
-					}
-				}
-				else if(structuralMatrix[rowZero][colZero] == -1)
-				{
-					for (__uint8_t colCount = colZero; colCount < numberOfElements; colCount++)
-					{
-						structuralMatrix[rowZero][colCount] += structuralMatrix[rowZero + (colZero - rowZero)][colCount];
-					}
-				}
-			}
-		}
-	}
-
-	delete[] bufferRow;
-}
-
-// 10. Выделение фундаментальной матрицы
+// 9. Выделение фундаментальной матрицы
 void ECC::allocate_fundamental_matrix()
 {
+	identity(structuralMatrix, numberOfNodes, numberOfElements);
 	fundamentalMatrix = new __int8_t* [numberOfNodes];
 	for (__uint8_t row = 0; row < numberOfNodes; row++)
 	{

@@ -2,6 +2,7 @@
 #define ECC_HPP
 
 #include <types.hpp>
+#include <matrix.hpp>
 #include <iostream>
 #include <set>
 #include <vector>
@@ -24,7 +25,6 @@ public:
 
 	void create_oriented_graph();
 	void elimination_of_matrix_dependency();
-	void conversion_to_the_identity_matrix();
 	void allocate_fundamental_matrix();
 
 	void calculate();

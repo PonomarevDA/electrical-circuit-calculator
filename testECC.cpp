@@ -1,9 +1,34 @@
 #include <testECC.hpp>
 
-
 using namespace std;
 
 ECC circuit;
+
+// Вывод значний двумерного вектора в терминал
+template <typename T>
+void showMatrix(T matrix)
+{
+	for(uint8_t row = 0; row < matrix.size(); row++)
+	{
+		for(uint8_t col = 0; col < matrix[0].size(); col++)
+			cout << matrix[row][col] << " ";
+		cout << endl;
+	}
+	cout << endl;
+}
+
+// Вывод значний двумерного массива в терминал
+template <typename T>
+void showMatrix(T** matrix, uint8_t ROWS, uint8_t COLS)
+{
+	for(uint8_t row = 0; row < ROWS; row++)
+	{
+		for(uint8_t col = 0; col < COLS; col++)
+			cout << matrix[row][col] << " ";
+		cout << endl;
+	}
+	cout << endl;
+}
 
 void CalculatedExample()
 {
@@ -33,11 +58,7 @@ void CalculatedExample()
 	circuit.elimination_of_matrix_dependency();
 	circuit.show_structural_matrix();
 
-	cout << "\n9. Преобразование матрицы в единичную:\n";
-	circuit.conversion_to_the_identity_matrix();
-	circuit.show_structural_matrix();
-
-	cout << "\n10. Выделение фундаментальной матрицы:\n";
+	cout << "\n9. Выделение фундаментальной матрицы:\n";
 	circuit.allocate_fundamental_matrix();
 	circuit.show_fundamental_matrix();
 }
@@ -106,15 +127,35 @@ void testTransposeMatrix()
 	showMatrix(totalMatrix);
 }
 
-
-template <typename T>
-void showMatrix(T matrix)
+void testIdentityMatrix()
 {
-	for(uint8_t row = 0; row < matrix.size(); row++)
+	// Initial Matrix:
+	uint8_t matrixRows = 3;
+	uint8_t matrixCols = 4;
+	vector < vector <double> > primaryMatrix( matrixRows, vector <double> (matrixCols) );
+	for(uint8_t row = 0; row < matrixRows; row++)
 	{
-		for(uint8_t col = 0; col < matrix[0].size(); col++)
-			cout << matrix[row][col] << " ";
-		cout << endl;
+		for(uint8_t col = 0; col < matrixCols; col++)
+			primaryMatrix[row][col] = col + row;
 	}
-	cout << endl;
+	showMatrix(primaryMatrix);
+}
+
+void testInverseMatrix()
+{
+	// Initial Matrix:
+	uint8_t matrixRows = 3;
+	uint8_t matrixCols = 3;
+	double** matrix = new double*[matrixRows];
+	for(uint8_t row = 0; row < matrixRows; row++)
+		matrix[row] = new double[matrixCols];
+	matrix[0][0] = 2; matrix[0][1] = 2; matrix[0][2] = 3;
+	matrix[1][0] = 4; matrix[1][1] = 5; matrix[1][2] = 6;
+	matrix[2][0] = 7; matrix[2][1] = 8; matrix[2][2] = 9;
+	showMatrix(matrix, matrixRows, matrixCols);
+
+
+	inverse(matrix, matrixRows, matrixCols);
+	showMatrix(matrix, matrixRows, matrixCols);
+
 }
