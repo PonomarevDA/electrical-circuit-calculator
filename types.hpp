@@ -10,7 +10,14 @@ enum error_t
 	DIMENSION_ERROR = 1,
 	DETERMINANT_ERROR = 2,
 	IDENTITY_ERROR = 3,
+	CANT_FIND = 4,
 	OTHER_ERROR
+};
+
+enum task_t
+{
+	FIND_VOLTAGE_SOURCE,
+	FIND_OTHER_ELEMENT
 };
 
 #endif // TYPES

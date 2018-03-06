@@ -4,32 +4,6 @@ using namespace std;
 
 ECC circuit;
 
-// Вывод значний двумерного вектора в терминал
-template <typename T>
-void showMatrix(T matrix)
-{
-	for(uint8_t row = 0; row < matrix.size(); row++)
-	{
-		for(uint8_t col = 0; col < matrix[0].size(); col++)
-			cout << matrix[row][col] << " ";
-		cout << endl;
-	}
-	cout << endl;
-}
-
-// Вывод значний двумерного массива в терминал
-template <typename T>
-void showMatrix(T** matrix, uint8_t ROWS, uint8_t COLS)
-{
-	for(uint8_t row = 0; row < ROWS; row++)
-	{
-		for(uint8_t col = 0; col < COLS; col++)
-			cout << matrix[row][col] << " ";
-		cout << endl;
-	}
-	cout << endl;
-}
-
 void CalculatedExample()
 {
 	cout << "1. Ввод данных об электрической схеме в правильном формате:\n";
@@ -40,7 +14,6 @@ void CalculatedExample()
 
 	cout << "\n3. Создание матрицы смежности:\n";
 	circuit.create_adjacency_matrix();
-	//circuit.show_adjacency_matrix();
 
 	cout << "\n4. Поиск остовного дерева графа:\n";
 	circuit.find_spanning_tree();
@@ -103,9 +76,6 @@ void testMultiplyMatrix()
 	//multiply(left, right, result);
 
 	// Output:
-	showMatrix(left);
-	showMatrix(right);
-	showMatrix(result);
 }
 
 
@@ -120,7 +90,6 @@ void testTransposeMatrix()
 		for(uint8_t col = 0; col < matrixCols; col++)
 			primaryMatrix[row][col] = col + row;
 	}
-	showMatrix(primaryMatrix);
 
 
 	// Tranponse Matrix:
@@ -128,7 +97,6 @@ void testTransposeMatrix()
 	uint8_t newMatrixCols = matrixRows;
 	vector < vector <double> > totalMatrix( newMatrixRows, vector <double> (newMatrixCols) );
 	//transpose(primaryMatrix, totalMatrix);
-	showMatrix(totalMatrix);
 }
 
 void testIdentityMatrix()
@@ -142,7 +110,6 @@ void testIdentityMatrix()
 		for(uint8_t col = 0; col < matrixCols; col++)
 			primaryMatrix[row][col] = col + row;
 	}
-	showMatrix(primaryMatrix);
 }
 
 void testInverseMatrix()

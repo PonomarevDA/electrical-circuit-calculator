@@ -7,6 +7,7 @@
 #include <set>
 #include <vector>
 #include <cstring>
+#include <iomanip>
 
 using namespace std;
 
@@ -42,6 +43,10 @@ private:
 	matrix Itree;				// Вектор токов дерева (Iд)
 	matrix Uchord;				// Вектор напряжений хорд (Uх)
 
+	void output_data(dataStr* dataArr, uint8_t lenght);
+	error_t make_nodes_a_branch_if_it_possible(uint8_t, uint8_t, task_t);
+	uint8_t find_number_of_element(const uint8_t node1, const uint8_t node2);
+
 public:
 	//ECC();
 	void input_data();			//
@@ -57,14 +62,6 @@ public:
 	void allocate_fundamental_matrix();
 
 	void calculate();
-
-	void show_adjacency_matrix();
-	void show_structural_matrix();
-	void show_fundamental_matrix();
-
-
-
-
 };
 
 

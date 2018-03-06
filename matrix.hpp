@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <math.h>
+#include <iomanip>
 
 class matrix
 {
@@ -38,7 +39,7 @@ private:
 	};
 public:
 	double** data;					// Массив данных
-	error_t status;					// Статус последнего выполненного метода
+	error_t status;			// Статус последнего выполненного метода
 
 	matrix();						// Конструктор без аргументов
 	matrix(uint8_t r, uint8_t c);	// Конструктор
