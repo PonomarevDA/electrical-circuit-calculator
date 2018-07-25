@@ -114,7 +114,7 @@ void testInverseMatrix()
 	// Initial Matrix:
 	uint8_t matrixRows = 3;
 	uint8_t matrixCols = 3;
-	Matrix m(matrixRows, matrixCols);
+	Matrix<double> m(matrixRows, matrixCols);
 	m[0][0] = 2; m[0][1] = 2; m[0][2] = 3;
 	m[1][0] = 4; m[1][1] = 5; m[1][2] = 6;
 	m[2][0] = 7; m[2][1] = 8; m[2][2] = 9;

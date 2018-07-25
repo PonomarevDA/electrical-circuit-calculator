@@ -11,25 +11,26 @@
 /**
 * @brief Declaration of class Matrix
 */
+template <class T>
 class Matrix
 {
 	private:
-		double&  at(int row, int col);				/// Get a link to an element
+		T&  at(uint8_t row, uint8_t col);		/// Get a link to an element
 		/**
 		* @brief Supporning structure for the index operator []
 		*/
 		struct Proxy
 		{
 			private:
-				Matrix& Matr;
-				int Row;
+				Matrix<T>& Matr;
+				uint8_t Row;
 			public:
-				Proxy (Matrix& matr, uint8_t index): Matr(matr), Row(index) {}
-				double & operator [] (int j)
+				Proxy (Matrix<T>& matr, uint8_t index): Matr(matr), Row(index) {}
+				T & operator [] (uint8_t j) const
 				{
 					return Matr.at(Row, j);
 				}
-				Proxy& operator = (const Proxy& right)
+				const Proxy& operator = (const Proxy& right) const
 				{
 					if (this == &right)
 					{
@@ -50,17 +51,17 @@ class Matrix
 		{
 			return Proxy(*this, i);
 		}
-		double determ();							/// Calculation of the matrix determinant
+		T determ();									/// Calculation of the matrix determinant
 		void identity();							/// Transformation the matrix into the identity matrix
 		Matrix inverse();							/// Inverse matrix
-		Matrix operator * (Matrix right);			/// Multiply matrix's
-		Matrix operator * (double right);			/// Multiply matrix with scalar
-		Matrix operator + (Matrix right);			/// Addition of matrix's
+		Matrix operator * (Matrix right);	/// Multiply matrix's
+		Matrix operator * (T right);				/// Multiply matrix with scalar
+		Matrix operator + (Matrix right);	/// Addition of matrix's
 		Matrix transpose();							/// Transpose matrix
 		void deleteLastRow();						/// Delete last row
 		void Show();								/// Show matrix in terminal
 
-		double** Data;								///< Data array
+		T** Data;									///< Data array
 		error_t Status;								///< Status of the last method performed
 };
 

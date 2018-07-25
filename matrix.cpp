@@ -13,20 +13,23 @@
 /**
 * @brief Constructor
 */
-Matrix::Matrix()
+template <class T>
+Matrix<T>::Matrix()
 {
 
 }
+template Matrix<double>::Matrix();
 
 
 /**
 * @brief Constructor with arguments
 */
-Matrix::Matrix(uint8_t rows, uint8_t cols) : ROWS(rows), COLS(cols)
+template <class T>
+Matrix<T>::Matrix(uint8_t rows, uint8_t cols) : ROWS(rows), COLS(cols)
 {
-	Data = new double*[ROWS];
+	Data = new T*[ROWS];
 	for(uint8_t count = 0; count < ROWS; count++)
-		Data[count] = new double[COLS];
+		Data[count] = new T[COLS];
 }
 
 
@@ -35,20 +38,23 @@ Matrix::Matrix(uint8_t rows, uint8_t cols) : ROWS(rows), COLS(cols)
 * @param rows - number of rows
 * @param cols - number of columns
 */
-void Matrix::Init(uint8_t rows, uint8_t cols)
+template <class T>
+void Matrix<T>::Init(uint8_t rows, uint8_t cols)
 {
 	ROWS = rows;
 	COLS = cols;
-	Data = new double*[ROWS];
+	Data = new T*[ROWS];
 	for(uint8_t count = 0; count < ROWS; count++)
-		Data[count] = new double[COLS];
+		Data[count] = new T[COLS];
 }
+template void Matrix<double>::Init(uint8_t rows, uint8_t cols);
 
 
 /**
 * @brief Show matrix in terminal
 */
-void Matrix::Show()
+template <class T>
+void Matrix<T>::Show()
 {
 	for(uint8_t row = 0; row < ROWS; row++)
 	{
@@ -59,6 +65,7 @@ void Matrix::Show()
 		std::cout << std::endl;
 	}
 }
+template void Matrix<double>::Show();
 
 
 /**
@@ -66,14 +73,15 @@ void Matrix::Show()
 * @param right - right matrix
 * @return composition of 2 matrix
 */
-Matrix Matrix::operator * (Matrix right)
+template <class T>
+Matrix<T> Matrix<T>::operator * (Matrix<T> right)
 {
 	// Check dimension:
 	if(COLS != right.ROWS)
 		Status = DIMENSION_ERROR;
 
 	// Main algorithm:
-	Matrix result(this->ROWS, right.COLS);
+	Matrix<T> result(this->ROWS, right.COLS);
 	for(uint8_t row = 0; row < result.ROWS; row++)
 	{
 		for(uint8_t col = 0; col < result.COLS; col++)
@@ -85,6 +93,7 @@ Matrix Matrix::operator * (Matrix right)
 	}
 	return result;
 }
+template Matrix<double> Matrix<double>::operator * (Matrix<double> right);
 
 
 /**
@@ -92,7 +101,8 @@ Matrix Matrix::operator * (Matrix right)
 * @param right - scalar
 * @return composition
 */
-Matrix Matrix::operator * (double right)
+template <class T>
+Matrix<T> Matrix<T>::operator * (T right)
 {
 	Matrix result(ROWS, COLS);
 	for(uint8_t row = 0; row < ROWS; row++)
@@ -104,6 +114,7 @@ Matrix Matrix::operator * (double right)
 	}
 	return result;
 }
+template Matrix<double> Matrix<double>::operator * (double right);
 
 
 /**
@@ -111,13 +122,14 @@ Matrix Matrix::operator * (double right)
 * @param right - right matrix
 * @return Sum of 2 matrix
 */
-Matrix Matrix::operator + (Matrix right)
+template <class T>
+Matrix<T> Matrix<T>::operator + (Matrix<T> right)
 {
 	// Check dimension:
 	if( (this->ROWS != right.ROWS) || (this->COLS != right.COLS) )
 		Status = DIMENSION_ERROR;
 
-	Matrix result(ROWS, COLS);
+	Matrix<T> result(ROWS, COLS);
 	if (Status == OK)
 	{
 		// Add matrix:
@@ -130,13 +142,15 @@ Matrix Matrix::operator + (Matrix right)
 	}
 	return result;
 }
+template Matrix<double> Matrix<double>::operator + (Matrix<double> right);
 
 
 /**
 * @brief Transpose the matrix
 * @return transpose matrix
 */
-Matrix Matrix::transpose()
+template <class T>
+Matrix<T> Matrix<T>::transpose()
 {
 	Matrix result(this->COLS, this->ROWS);
 	for(uint8_t row = 0; row < ROWS; row++)
@@ -146,13 +160,15 @@ Matrix Matrix::transpose()
 	}
 	return result;
 }
+template Matrix<double> Matrix<double>::transpose();
 
 
 /**
 * @brief Calculation of the matrix determinant
 * @return matrix determinant
 */
-double Matrix::determ()
+template <class T>
+T Matrix<T>::determ()
 {
 	// Check dimension - matrix should be square
 	if(this->COLS != this->ROWS)
@@ -161,7 +177,7 @@ double Matrix::determ()
 	// Main algorithm
 	uint8_t size = COLS;
 	uint8_t i,j;
-	double det = 0;
+	T det = 0;
 
 	if( (this->COLS == 1) && (this->ROWS == 1))
 		det = (*this)[0][0];
@@ -172,7 +188,7 @@ double Matrix::determ()
 	}
 	else
 	{
-		Matrix temp(size -1, size -1);
+		Matrix<T> temp(size -1, size -1);
 		for(i = 0; i < size; i++)
 		{
 			for(j = 0; j < size-1; j++)
@@ -182,26 +198,30 @@ double Matrix::determ()
 				else
 					temp.Data[j] = this->Data[j+1];
 			}
-			det+= pow((double)-1, (i+j))*temp.determ()*(*this)[i][size-1];
+			det+= pow((T)-1, (i+j))*temp.determ()*(*this)[i][size-1];
 		}
 	}
 	return det;
 }
+template double Matrix<double>::determ();
 
 
 /**
 * @brief Delete last row of matrix
 */
-void Matrix::deleteLastRow()
+template <class T>
+void Matrix<T>::deleteLastRow()
 {
 	ROWS--;
 }
+template void Matrix<double>::deleteLastRow();
 
 
 /**
 * @brief Transformation the matrix into the identity matrix
 */
-void Matrix::identity()
+template <class T>
+void Matrix<T>::identity()
 {
 	error_t error = OK;
 	uint8_t* bufferRow;
@@ -232,7 +252,7 @@ void Matrix::identity()
 		{
 			if((*this)[countConv][countConv] != 1)
 			{
-				double firstElement = (*this)[countConv][countConv];
+				T firstElement = (*this)[countConv][countConv];
 				for(uint8_t countDiv = countConv; countDiv < COLS; countDiv++)
 					(*this)[countConv][countDiv] /= firstElement;
 			}
@@ -245,7 +265,7 @@ void Matrix::identity()
 			{
 				if((*this)[rowZero][countConv] != 0)
 				{
-					double coefficient = (*this)[rowZero][countConv];
+					T coefficient = (*this)[rowZero][countConv];
 					for(uint8_t colZero = countConv; colZero < COLS; colZero++)
 						(*this)[rowZero][colZero] -= coefficient*(*this)[countConv][colZero];
 				}
@@ -261,7 +281,7 @@ void Matrix::identity()
 			{
 				if ((*this)[rowZero][colZero] != 0)
 				{
-					double coefficient = (*this)[rowZero][colZero];
+					T coefficient = (*this)[rowZero][colZero];
 					for (uint8_t colCount = colZero; colCount < COLS; colCount++)
 						(*this)[rowZero][colCount] -= coefficient*(*this)[colZero][colCount];
 				}
@@ -271,12 +291,14 @@ void Matrix::identity()
 	delete[] bufferRow;
 	Status = OK;
 }
+template void Matrix<double>::identity();
 
 
 /**
 * @brief Get inverse matrix
 */
-Matrix Matrix::inverse()
+template <class T>
+Matrix<T> Matrix<T>::inverse()
 {
 	// Check dimension - matrix must be square:
 	if(ROWS != COLS)
@@ -312,9 +334,10 @@ Matrix Matrix::inverse()
 
 	// Return
 	for(uint8_t row = 0; row < ROWS; row++)
-		memcpy(result.Data[row], buffer.Data[row] + COLS, COLS*sizeof(double));
+		memcpy(result.Data[row], buffer.Data[row] + COLS, COLS*sizeof(T));
 	return result;
 }
+template Matrix<double> Matrix<double>::inverse();
 
 /*********************Private area*********************/
 /**
@@ -323,7 +346,9 @@ Matrix Matrix::inverse()
 * @param col - index of column
 * @return link to an element
 */
-double& Matrix::at(int row, int col)
+template <class T>
+T& Matrix<T>::at(uint8_t row, uint8_t col)
 {
 	return Data[row][col];
 }
+template double& Matrix<double>::at(uint8_t row, uint8_t col);

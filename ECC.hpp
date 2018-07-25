@@ -31,16 +31,16 @@ private:
 
 	vector<uint8_t> branches;	// вектор элементов - ветвей дерева
 	vector<uint8_t> chords;		// вектор элементов - хорд
-	Matrix adjacencyMatrix;		// матрица смежности
-	Matrix structuralMatrix;	// структурная матрица
+	Matrix<double> adjacencyMatrix;		// матрица смежности
+	Matrix<double> structuralMatrix;	// структурная матрица
 
-	Matrix Rtree;				// диагональная матрица сопротивлений ветвей (Ом)
-	Matrix Gchord;				// диагональная матрица проводимостей хорд (См)
-	Matrix U0;					// вектор напряжений (В)
-	Matrix I0;					// вектор токов (А)
-	Matrix F;					// фундаментальная матрица (F)
-	Matrix Itree;				// Вектор токов дерева (Iд)
-	Matrix Uchord;				// Вектор напряжений хорд (Uх)
+	Matrix<double> Rtree;				// диагональная матрица сопротивлений ветвей (Ом)
+	Matrix<double> Gchord;				// диагональная матрица проводимостей хорд (См)
+	Matrix<double> U0;					// вектор напряжений (В)
+	Matrix<double> I0;					// вектор токов (А)
+	Matrix<double> F;					// фундаментальная матрица (F)
+	Matrix<double> Itree;				// Вектор токов дерева (Iд)
+	Matrix<double> Uchord;				// Вектор напряжений хорд (Uх)
 
 	void output_data(dataStr* dataArr, uint8_t lenght);
 	error_t make_nodes_a_branch_if_it_possible(uint8_t, uint8_t, task_t);

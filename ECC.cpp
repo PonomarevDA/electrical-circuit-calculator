@@ -301,10 +301,10 @@ void ECC::calculate()
 {
 	Itree.Init(branches.size(), 0);
 	{
-		Matrix bufferLeft(branches.size(), branches.size());
-		Matrix bufferRight(branches.size(), branches.size());
-		Matrix buffer(branches.size(), branches.size());
-		Matrix ones(branches.size(), branches.size());
+		Matrix<double> bufferLeft(branches.size(), branches.size());
+		Matrix<double> bufferRight(branches.size(), branches.size());
+		Matrix<double> buffer(branches.size(), branches.size());
+		Matrix<double> ones(branches.size(), branches.size());
 		for(uint8_t row = 0; row < branches.size(); row++)
 		{
 			for(uint8_t col = 0; col < branches.size(); col++)
@@ -326,10 +326,10 @@ void ECC::calculate()
 
 	Uchord.Init(chords.size(), 0);
 	{
-		Matrix ones	(chords.size(), chords.size());
-		Matrix buffer(chords.size(), chords.size());
-		Matrix bufferRight(chords.size(), chords.size());
-		Matrix bufferLeft(chords.size(), chords.size());
+		Matrix<double> ones	(chords.size(), chords.size());
+		Matrix<double> buffer(chords.size(), chords.size());
+		Matrix<double> bufferRight(chords.size(), chords.size());
+		Matrix<double> bufferLeft(chords.size(), chords.size());
 		for(uint8_t row = 0; row < chords.size(); row++)
 		{
 			for(uint8_t col = 0; col < chords.size(); col++)
