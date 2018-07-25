@@ -26,15 +26,12 @@ void CalculatedExample()
 
 	cout << "\n7. Создание ориентированного графа:\n";
 	circuit.create_oriented_graph();
-//	circuit.show_structural_matrix();
 
 	cout << "\n8. Устранение матричной зависимости:\n";
 	circuit.elimination_of_matrix_dependency();
-	//circuit.show_structural_matrix();
 
 	cout << "\n9. Выделение фундаментальной матрицы:\n";
 	circuit.allocate_fundamental_matrix();
-	//circuit.show_fundamental_matrix();
 
 	cout << "\n10. Ответ:\n";
 	circuit.calculate();
@@ -117,12 +114,12 @@ void testInverseMatrix()
 	// Initial Matrix:
 	uint8_t matrixRows = 3;
 	uint8_t matrixCols = 3;
-	matrix m(matrixRows, matrixCols);
+	Matrix m(matrixRows, matrixCols);
 	m[0][0] = 2; m[0][1] = 2; m[0][2] = 3;
 	m[1][0] = 4; m[1][1] = 5; m[1][2] = 6;
 	m[2][0] = 7; m[2][1] = 8; m[2][2] = 9;
-	m.show();
+	m.Show();
 	m.inverse();
-	m.show();
+	m.Show();
 
 }

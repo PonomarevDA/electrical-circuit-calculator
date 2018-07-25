@@ -1,76 +1,100 @@
+/**
+* @file matrix.hpp
+* @brief Implementation of class Matrix
+*/
+
 #include <matrix.hpp>
 #include <iostream>
+#include <cstring>	// for memcpy()
+#include <math.h>	// for pow()
 
-using namespace std;
-
-/*********************Private area*********************/
-// Получить ссылку на элемент
-double& matrix::at(int row, int col)
-{
-	return data[row][col];
-}
 
 /*********************Public area*********************/
-// Конструктор без аргументов
-matrix::matrix() {}
-
-// Конструктор
-matrix::matrix(uint8_t r, uint8_t c) : ROWS(r), COLS(c)
+/**
+* @brief Constructor
+*/
+Matrix::Matrix()
 {
-	data = new double*[ROWS];
-	for(uint8_t count = 0; count < ROWS; count++)
-		data[count] = new double[COLS];
+
 }
 
-// Инициализация
-void matrix::init(uint8_t r, uint8_t c)
+
+/**
+* @brief Constructor with arguments
+*/
+Matrix::Matrix(uint8_t rows, uint8_t cols) : ROWS(rows), COLS(cols)
 {
-	ROWS = r;
-	COLS = c;
-	data = new double*[ROWS];
+	Data = new double*[ROWS];
 	for(uint8_t count = 0; count < ROWS; count++)
-		data[count] = new double[COLS];
+		Data[count] = new double[COLS];
 }
 
-// Вывод матрицы в терминал
-void matrix::show()
+
+/**
+* @brief Initialization
+* @param rows - number of rows
+* @param cols - number of columns
+*/
+void Matrix::Init(uint8_t rows, uint8_t cols)
+{
+	ROWS = rows;
+	COLS = cols;
+	Data = new double*[ROWS];
+	for(uint8_t count = 0; count < ROWS; count++)
+		Data[count] = new double[COLS];
+}
+
+
+/**
+* @brief Show matrix in terminal
+*/
+void Matrix::Show()
 {
 	for(uint8_t row = 0; row < ROWS; row++)
 	{
 		for(uint8_t col = 0; col < COLS; col++)
 		{
-			cout << data[row][col] << " ";
+			std::cout << Data[row][col] << " ";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 }
 
-// Умножение матриц
-matrix matrix::operator * (matrix right)
+
+/**
+* @brief Multiply matrix's
+* @param right - right matrix
+* @return composition of 2 matrix
+*/
+Matrix Matrix::operator * (Matrix right)
 {
 	// Check dimension:
-	if(this->COLS != right.ROWS)
-		status = DIMENSION_ERROR;
+	if(COLS != right.ROWS)
+		Status = DIMENSION_ERROR;
 
-	// Multiply matrix:
-	matrix result(this->ROWS, right.COLS);
+	// Main algorithm:
+	Matrix result(this->ROWS, right.COLS);
 	for(uint8_t row = 0; row < result.ROWS; row++)
 	{
 		for(uint8_t col = 0; col < result.COLS; col++)
 		{
 			result[row][col] = 0;
-			for(uint8_t count = 0; count < this->COLS; count++)
+			for(uint8_t count = 0; count < COLS; count++)
 				result[row][col] += (*this)[row][count]*right[count][col];
 		}
 	}
 	return result;
 }
 
-// Умножение матриц
-matrix matrix::operator * (double right)
+
+/**
+* @brief Multiply matrix with scalar
+* @param right - scalar
+* @return composition
+*/
+Matrix Matrix::operator * (double right)
 {
-	// Multiply matrix:
-	matrix result(ROWS, COLS);
+	Matrix result(ROWS, COLS);
 	for(uint8_t row = 0; row < ROWS; row++)
 	{
 		for(uint8_t col = 0; col < COLS; col++)
@@ -81,14 +105,20 @@ matrix matrix::operator * (double right)
 	return result;
 }
 
-// Сложение матриц
-matrix matrix::operator + (matrix right)
+
+/**
+* @brief Addition of matrix's
+* @param right - right matrix
+* @return Sum of 2 matrix
+*/
+Matrix Matrix::operator + (Matrix right)
 {
 	// Check dimension:
 	if( (this->ROWS != right.ROWS) || (this->COLS != right.COLS) )
-		status = DIMENSION_ERROR;
-	matrix result(ROWS, COLS);
-	if (status == OK)
+		Status = DIMENSION_ERROR;
+
+	Matrix result(ROWS, COLS);
+	if (Status == OK)
 	{
 		// Add matrix:
 		for(uint8_t row = 0; row < ROWS; row++)
@@ -101,11 +131,14 @@ matrix matrix::operator + (matrix right)
 	return result;
 }
 
-// Транспонирование матрицы
-matrix matrix::transpose()
+
+/**
+* @brief Transpose the matrix
+* @return transpose matrix
+*/
+Matrix Matrix::transpose()
 {
-	// Transpose matrix:
-	matrix result(this->COLS, this->ROWS);
+	Matrix result(this->COLS, this->ROWS);
 	for(uint8_t row = 0; row < ROWS; row++)
 	{
 		for(uint8_t col = 0; col < COLS; col++)
@@ -114,8 +147,12 @@ matrix matrix::transpose()
 	return result;
 }
 
-// Вернуть значение определителя квадратной матрицы
-double matrix::determ()
+
+/**
+* @brief Calculation of the matrix determinant
+* @return matrix determinant
+*/
+double Matrix::determ()
 {
 	// Check dimension - matrix should be square
 	if(this->COLS != this->ROWS)
@@ -135,15 +172,15 @@ double matrix::determ()
 	}
 	else
 	{
-		matrix temp(size -1, size -1);
+		Matrix temp(size -1, size -1);
 		for(i = 0; i < size; i++)
 		{
 			for(j = 0; j < size-1; j++)
 			{
 				if(j < i)
-					temp.data[j] = this->data[j];
+					temp.Data[j] = this->Data[j];
 				else
-					temp.data[j] = this->data[j+1];
+					temp.Data[j] = this->Data[j+1];
 			}
 			det+= pow((double)-1, (i+j))*temp.determ()*(*this)[i][size-1];
 		}
@@ -151,39 +188,46 @@ double matrix::determ()
 	return det;
 }
 
-void matrix::deleteLastRow()
+
+/**
+* @brief Delete last row of matrix
+*/
+void Matrix::deleteLastRow()
 {
 	ROWS--;
 }
 
-// Преобразование матрицы в единичную
-void matrix::identity()
+
+/**
+* @brief Transformation the matrix into the identity matrix
+*/
+void Matrix::identity()
 {
 	error_t error = OK;
 	uint8_t* bufferRow;
 	bufferRow = new uint8_t[COLS];
 
-	// Прямой ход
+	// Straight process
 	for (uint8_t countConv = 0; countConv < ROWS; countConv++)
 	{
-		// Перестановка строк матрицы, если необходимо:
+		// Permutation of rows of the matrix, if necessary
 		if((*this)[countConv][countConv] == 0)
 		{
 			uint8_t countSort;
-			memcpy(bufferRow, (this->data + countConv*COLS), COLS - countConv);
+			memcpy(bufferRow, (this->Data + countConv*COLS), COLS - countConv);
 			for(countSort = countConv + 1; countSort < ROWS; countSort++)
 			{
 				if((*this)[countSort][countConv] != 0)
 				{
-					memcpy((this->data + countConv*COLS), (this->data  + countSort*COLS + countConv), COLS - countConv);
-					memcpy((this->data + countSort*COLS + countConv), bufferRow, COLS - countConv);
+					memcpy((this->Data + countConv*COLS), (this->Data  + countSort*COLS + countConv), COLS - countConv);
+					memcpy((this->Data + countSort*COLS + countConv), bufferRow, COLS - countConv);
 					break;
 				}
 			}
 			if(countSort == ROWS - 1)
 				error = IDENTITY_ERROR;
 		}
-		// Делим всю строку на первый её элемент:
+		// Divide the entire string into her first element:
 		if(error == OK)
 		{
 			if((*this)[countConv][countConv] != 1)
@@ -194,7 +238,7 @@ void matrix::identity()
 			}
 		}
 
-		// Обнуляем элменты под номерами countConv для нижних строк:
+		// Reset elements to countConv numbers for the bottom rows:
 		if(error == OK)
 		{
 			for(uint8_t rowZero = countConv + 1; rowZero < ROWS; rowZero++)
@@ -208,7 +252,7 @@ void matrix::identity()
 			}
 		}
 	}
-	// Обратный ход
+	// Reverse process
 	if(error == OK)
 	{
 		for (int8_t rowZero = ROWS - 2; rowZero >= 0; rowZero--)
@@ -225,25 +269,28 @@ void matrix::identity()
 		}
 	}
 	delete[] bufferRow;
-	status = OK;
+	Status = OK;
 }
 
-// Обратная матрица
-matrix matrix::inverse()
+
+/**
+* @brief Get inverse matrix
+*/
+Matrix Matrix::inverse()
 {
 	// Check dimension - matrix must be square:
 	if(ROWS != COLS)
-		status = DIMENSION_ERROR;
+		Status = DIMENSION_ERROR;
 
 	// Check determinant
 	if(determ() == 0)
-		status = DETERMINANT_ERROR;
+		Status = DETERMINANT_ERROR;
 
 	// Init buffer
 	uint8_t bufferRows = ROWS;
 	uint8_t bufferCols = COLS << 1;
-	matrix result(ROWS, COLS);
-	matrix buffer(bufferRows, bufferCols);
+	Matrix result(ROWS, COLS);
+	Matrix buffer(bufferRows, bufferCols);
 
 	// Main algorithm
 	for(uint8_t row = 0; row < bufferRows; row++)
@@ -262,8 +309,21 @@ matrix matrix::inverse()
 		}
 	}
 	buffer.identity();
+
 	// Return
 	for(uint8_t row = 0; row < ROWS; row++)
-		memcpy(result.data[row], buffer.data[row] + COLS, COLS*sizeof(double));
+		memcpy(result.Data[row], buffer.Data[row] + COLS, COLS*sizeof(double));
 	return result;
+}
+
+/*********************Private area*********************/
+/**
+* @brief Get a link to an element of matrix
+* @param row - index of row
+* @param col - index of column
+* @return link to an element
+*/
+double& Matrix::at(int row, int col)
+{
+	return Data[row][col];
 }

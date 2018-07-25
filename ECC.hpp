@@ -4,7 +4,6 @@
 #include <types.hpp>
 #include <matrix.hpp>
 #include <iostream>
-#include <set>
 #include <vector>
 #include <cstring>
 #include <iomanip>
@@ -26,22 +25,22 @@ private:
 		double value;
 	};
 
-	dataStr* dataArr;			// входные данные
-	uint8_t numberOfNodes;		// входные данные
-	uint8_t numberOfElements;	// входные данные
+	dataStr* dataArr;			// массив данных о системе
+	uint8_t numberOfNodes;		// данные о системе
+	uint8_t numberOfElements;	// данные о системе
 
 	vector<uint8_t> branches;	// вектор элементов - ветвей дерева
 	vector<uint8_t> chords;		// вектор элементов - хорд
-	matrix adjacencyMatrix;		// матрица смежности
-	matrix structuralMatrix;	// структурная матрица
+	Matrix adjacencyMatrix;		// матрица смежности
+	Matrix structuralMatrix;	// структурная матрица
 
-	matrix Rtree;				// диагональная матрица сопротивлений (Ом)
-	matrix Gchord;				// диагональная матрица проводимостей (См)
-	matrix U0;					// вектор напряжений (В)
-	matrix I0;					// вектор токов (А)
-	matrix F;					// фундаментальная матрица (F)
-	matrix Itree;				// Вектор токов дерева (Iд)
-	matrix Uchord;				// Вектор напряжений хорд (Uх)
+	Matrix Rtree;				// диагональная матрица сопротивлений ветвей (Ом)
+	Matrix Gchord;				// диагональная матрица проводимостей хорд (См)
+	Matrix U0;					// вектор напряжений (В)
+	Matrix I0;					// вектор токов (А)
+	Matrix F;					// фундаментальная матрица (F)
+	Matrix Itree;				// Вектор токов дерева (Iд)
+	Matrix Uchord;				// Вектор напряжений хорд (Uх)
 
 	void output_data(dataStr* dataArr, uint8_t lenght);
 	error_t make_nodes_a_branch_if_it_possible(uint8_t, uint8_t, task_t);
@@ -49,19 +48,19 @@ private:
 
 public:
 	//ECC();
-	void input_data();			//
-	void sort_data();
+	void input_data();							// 1. Ввод данных о схеме
+	void sort_data();							// 2. Сортировка данных
 
-	void create_adjacency_matrix();
-	void find_spanning_tree();
-	void create_equations_voltage_of_branches();
-	void create_equations_current_of_chords();
+	void create_adjacency_matrix();				// 3. Создание матрицы смежности
+	void find_spanning_tree();					// 4. Поиск ветвей остовного дерева
+	void create_equations_voltage_of_branches();// 5. Создание уравнений напряжения ветвей
+	void create_equations_current_of_chords();	// 6. Создание уравнений токов хорд
 
-	void create_oriented_graph();
-	void elimination_of_matrix_dependency();
-	void allocate_fundamental_matrix();
+	void create_oriented_graph();				// 7. Создание ориентированного графа
+	void elimination_of_matrix_dependency();	// 8. Удаление базисного узла
+	void allocate_fundamental_matrix();			// 9. Выделение фундаментальной матрицы
 
-	void calculate();
+	void calculate();							// 10. Расчет токов/напряжений
 };
 
 

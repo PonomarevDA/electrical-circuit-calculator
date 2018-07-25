@@ -1,67 +1,68 @@
-#ifndef MATRIX
-#define MATRIX
+/**
+* @file matrix.hpp
+* @brief Declaration of class Matrix
+*/
+
+#ifndef MATRIX_HPP
+#define MATRIX_HPP
 
 #include <types.hpp>
-#include <iostream>
-#include <vector>
-#include <cstring>
-#include <math.h>
-#include <iomanip>
 
-class matrix
+/**
+* @brief Declaration of class Matrix
+*/
+class Matrix
 {
-private:
-	uint8_t ROWS;					// количество строк
-	uint8_t COLS;					// количество столбцов
-	double&  at(int row, int col);	// Получить ссылку на элемент
-
-	// Вспомогательная структура для оператора индексирования
-	struct proxy
-	{
 	private:
-		matrix& m_;
-		int i_;
+		double&  at(int row, int col);				/// Get a link to an element
+		/**
+		* @brief Supporning structure for the index operator []
+		*/
+		struct Proxy
+		{
+			private:
+				Matrix& Matr;
+				int Row;
+			public:
+				Proxy (Matrix& matr, uint8_t index): Matr(matr), Row(index) {}
+				double & operator [] (int j)
+				{
+					return Matr.at(Row, j);
+				}
+				Proxy& operator = (const Proxy& right)
+				{
+					if (this == &right)
+					{
+						return *this;
+					}
+					Matr.Data[Row] = right.Matr.Data[right.Row];
+					return *this;
+				}
+		};
+
+		uint8_t ROWS;								///< Number of rows
+		uint8_t COLS;								///< Number of columns
 	public:
-		proxy (matrix& m, uint8_t i): m_(m), i_(i) {}
-		double & operator [] (int j)
+		Matrix();									/// Constructor
+		Matrix(uint8_t rows, uint8_t cols);			/// Constructor with arguments
+		void Init(uint8_t rows, uint8_t cols);		/// Initialization
+		Proxy operator[] (uint8_t i)				/// Overload the indexing operator
 		{
-			return m_.at(i_, j);
+			return Proxy(*this, i);
 		}
-		proxy& operator = (const proxy& right)
-		{
-			if (this == &right)
-			{
-				return *this;
-			}
-			m_.data[i_] = right.m_.data[right.i_];
-			return *this;
-		}
-	};
-public:
-	double** data;					// Массив данных
-	error_t status;			// Статус последнего выполненного метода
+		double determ();							/// Calculation of the matrix determinant
+		void identity();							/// Transformation the matrix into the identity matrix
+		Matrix inverse();							/// Inverse matrix
+		Matrix operator * (Matrix right);			/// Multiply matrix's
+		Matrix operator * (double right);			/// Multiply matrix with scalar
+		Matrix operator + (Matrix right);			/// Addition of matrix's
+		Matrix transpose();							/// Transpose matrix
+		void deleteLastRow();						/// Delete last row
+		void Show();								/// Show matrix in terminal
 
-	matrix();						// Конструктор без аргументов
-	matrix(uint8_t r, uint8_t c);	// Конструктор
-	void init(uint8_t r, uint8_t c);// Инициализация
-	proxy operator[] (uint8_t i)	// Перегрузка оператора индексации
-	{
-		return proxy(*this, i);
-	}
-
-
-	double determ();					// Расчет определителя матрицы
-	void identity();					// Преобразование матрицы в единичную
-	matrix inverse();					// Обратная матрица
-	matrix operator * (matrix right);	// Умножение матриц
-	matrix operator * (double right);	// Умножение матриц
-	matrix operator + (matrix right);	// Сложение матриц
-	matrix transpose();					// Транспонирование матрицы
-	void deleteLastRow();				// Удалить последюю строку
-	void show();						// Вывод матрицы в терминал
-
-
+		double** Data;								///< Data array
+		error_t Status;								///< Status of the last method performed
 };
 
-#endif // MATRIX
+#endif // MATRIX_HPP
 

@@ -48,7 +48,7 @@ void ECC::sort_data()
 void ECC::create_adjacency_matrix()
 {
 	// Выделение памяти для матрицы смежности (считаем граф неориентированным):
-	adjacencyMatrix.init(numberOfNodes, numberOfNodes);
+	adjacencyMatrix.Init(numberOfNodes, numberOfNodes);
 
 	// Заполняем матрицу смежности: 1 - есть ребро, 0 - нет ребра
 	for(uint8_t count = 0; count < numberOfElements; count++)
@@ -58,7 +58,7 @@ void ECC::create_adjacency_matrix()
 	}
 
 	// Вывод матрицы смоежности в терминал
-	adjacencyMatrix.show();
+	adjacencyMatrix.Show();
 }
 
 // 4. Поиск остовного дерева
@@ -162,7 +162,7 @@ void ECC::find_spanning_tree()
 void ECC::create_equations_voltage_of_branches()
 {
 	// Матрица сопротивлений ветвей дерева:
-	Rtree.init(branches.size(), branches.size());
+	Rtree.Init(branches.size(), branches.size());
 	for(uint8_t element = 0; element < branches.size(); element++)
 	{
 		for(uint8_t col = 0; col < branches.size(); col++)
@@ -171,11 +171,11 @@ void ECC::create_equations_voltage_of_branches()
 			Rtree[element][element] = dataArr[ *(branches.begin() + element) -1 ].value;
 	}
 	cout << "Rtree:" << endl;
-	Rtree.show();
+	Rtree.Show();
 	cout << endl;
 
 	// Вектор напряжений ветвей дерева:
-	U0.init(branches.size(), 1);
+	U0.Init(branches.size(), 1);
 	for(uint8_t element = 0; element < branches.size(); element++)
 	{
 		if(dataArr[ *(branches.begin() + element) -1 ].type == 'u')
@@ -184,7 +184,7 @@ void ECC::create_equations_voltage_of_branches()
 			U0[element][0] = 0;
 	}
 	cout << "U0:" << endl;
-	U0.show();
+	U0.Show();
 	cout << endl;
 
 	// Вывод на экран номера ветвей дерева
@@ -198,7 +198,7 @@ void ECC::create_equations_voltage_of_branches()
 void ECC::create_equations_current_of_chords()
 {
 	// Матрица проводимости хорд:
-	Gchord.init( chords.size(), chords.size() );
+	Gchord.Init( chords.size(), chords.size() );
 	for(uint8_t element = 0; element < chords.size(); element++)
 	{
 		for(uint8_t col = 0; col < chords.size(); col++)
@@ -207,11 +207,11 @@ void ECC::create_equations_current_of_chords()
 			Gchord[element][element] = 1 / dataArr[ *(chords.begin() + element) -1 ].value;
 	}
 	cout << "Gchords:" << endl;
-	Gchord.show();
+	Gchord.Show();
 	cout << endl;
 
 	// Вектор токов хорд:
-	I0.init(chords.size(), 1);
+	I0.Init(chords.size(), 1);
 	for(uint8_t element = 0; element < chords.size(); element++)
 	{
 		if(dataArr[ *(chords.begin() + element) -1 ].type == 'i')
@@ -220,7 +220,7 @@ void ECC::create_equations_current_of_chords()
 			I0[element][0] = 0;
 	}
 	cout << "I0:" << endl;
-	I0.show();
+	I0.Show();
 	cout << endl;
 
 	// Вывод на экран номера хорд
@@ -234,7 +234,7 @@ void ECC::create_equations_current_of_chords()
 void ECC::create_oriented_graph()
 {
 	// Выделение памяти для структурной матрицы и инициализация
-	structuralMatrix.init(numberOfNodes, numberOfElements);
+	structuralMatrix.Init(numberOfNodes, numberOfElements);
 	for (__uint8_t row = 0; row < numberOfNodes; row++)
 	{
 		for(__uint8_t col = 0; col < numberOfElements; col++)
@@ -248,7 +248,7 @@ void ECC::create_oriented_graph()
 	}
 
 	// Вывод матрицы в терминал:
-	structuralMatrix.show();
+	structuralMatrix.Show();
 }
 
 
@@ -278,7 +278,7 @@ void ECC::elimination_of_matrix_dependency()
 	}
 
 	// Вывод матрицы в терминал:
-	structuralMatrix.show();
+	structuralMatrix.Show();
 }
 
 
@@ -286,25 +286,25 @@ void ECC::elimination_of_matrix_dependency()
 void ECC::allocate_fundamental_matrix()
 {
 	structuralMatrix.identity();
-	structuralMatrix.show();
-	F.init(numberOfNodes, numberOfElements - numberOfNodes);
+	structuralMatrix.Show();
+	F.Init(numberOfNodes, numberOfElements - numberOfNodes);
 	for (uint8_t row = 0; row < numberOfNodes; row++)
-		memcpy(F.data[row], structuralMatrix.data[row] + numberOfNodes, (numberOfElements - numberOfNodes)*sizeof(double));
+		memcpy(F.Data[row], structuralMatrix.Data[row] + numberOfNodes, (numberOfElements - numberOfNodes)*sizeof(double));
 
 	// Вывод матрицы в терминал:
 	cout << "F:" << endl;
-	F.show();
+	F.Show();
 }
 
 // 10. Алгоритм расчета цепи
 void ECC::calculate()
 {
-	Itree.init(branches.size(), 0);
+	Itree.Init(branches.size(), 0);
 	{
-		matrix bufferLeft(branches.size(), branches.size());
-		matrix bufferRight(branches.size(), branches.size());
-		matrix buffer(branches.size(), branches.size());
-		matrix ones(branches.size(), branches.size());
+		Matrix bufferLeft(branches.size(), branches.size());
+		Matrix bufferRight(branches.size(), branches.size());
+		Matrix buffer(branches.size(), branches.size());
+		Matrix ones(branches.size(), branches.size());
 		for(uint8_t row = 0; row < branches.size(); row++)
 		{
 			for(uint8_t col = 0; col < branches.size(); col++)
@@ -321,15 +321,15 @@ void ECC::calculate()
 		bufferRight = bufferRight + buffer;
 		Itree = bufferLeft * bufferRight * (-1);
 		cout << endl;
-		Itree.show();
+		Itree.Show();
 	}
 
-	Uchord.init(chords.size(), 0);
+	Uchord.Init(chords.size(), 0);
 	{
-		matrix ones(chords.size(), chords.size());
-		matrix buffer(chords.size(), chords.size());
-		matrix bufferRight(chords.size(), chords.size());
-		matrix bufferLeft(chords.size(), chords.size());
+		Matrix ones	(chords.size(), chords.size());
+		Matrix buffer(chords.size(), chords.size());
+		Matrix bufferRight(chords.size(), chords.size());
+		Matrix bufferLeft(chords.size(), chords.size());
 		for(uint8_t row = 0; row < chords.size(); row++)
 		{
 			for(uint8_t col = 0; col < chords.size(); col++)
@@ -346,7 +346,7 @@ void ECC::calculate()
 		bufferRight = bufferRight + buffer;
 		Uchord = bufferLeft * bufferRight * (-1);
 		cout << endl;
-		Uchord.show();
+		Uchord.Show();
 	}
 }
 
